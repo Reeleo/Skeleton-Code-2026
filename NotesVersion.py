@@ -111,6 +111,7 @@ class Simulation():
         for Row in range(1, self._NumberOfRows + 1):
             for Column in range(1, self._NumberOfColumns + 1):
                 self._Grid.append(Cell(Row, Column))
+                # sets up 1d list (grid) of cell objects
 
         # sets up a nest at 2,4 every time
         # if multiple nests then the other is random
@@ -404,7 +405,7 @@ class Ant(Entity):
         return self._TypeOfAnt
 
 class QueenAnt(Ant):
-    def __init__(self, StartRow, StartColumn, NestInRow, NestInColumn):
+    def __init__(self, StartRow, StartColumn, NestInRow, NestInColumn): # /:(
         super().__init__(StartRow, StartColumn, NestInRow, NestInColumn)
         self._TypeOfAnt = "queen"
 
@@ -511,3 +512,20 @@ class Pheromone(Entity):
 
 if __name__ == "__main__":
     Main()
+
+
+'''
+CLASS DIAGRAMS:
++ public
+# protected (these are protected _)
+- private
+inheritance (arrow point to parent)
+
+Entity (_Row,_Column,_ID)
+- Cell (super,_AmountOfFood)
+- Ant (super,_NestRow,_NestColumn,Stages,_AmountOfFoodCarried,_FoodCapacity,_TypeOfAnt)
+    - QueenAnt (super)
+    - WorkerAnt (super)
+- Nest (super,_FoodLevel,_NumberOfQueens)
+- Pheromone (super,_BelongsTo,_Strength,_PheromoneDecay)519915
+'''
