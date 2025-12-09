@@ -4,6 +4,8 @@
 #written by the AQA Programmer Team
 #developed in the Python 3.9 programming environment
 
+# paper one sections c and d
+
 import random
 
 def Main():
@@ -127,8 +129,8 @@ class Simulation():
                         Allowed = False
             self.SetUpANestAt(Row, Column)
 
-        # food can be placed whereever there is no 2 4 nest (no other check)
-        # no check at other nest
+        # food can be placed where ever there is no 2 4 nest (no other check)
+        # no check at other nest !!
         for Count in range(1, self._StartingNumberOfFoodCells + 1):
             Row = 2
             Column = 4
@@ -136,21 +138,29 @@ class Simulation():
                 Row = random.randint(1, self._NumberOfRows)
                 Column = random.randint(1, self._NumberOfColumns)
             self.AddFoodToCell(Row, Column, 500)
-            # 500 is hard coded
+            # 500 food is hard coded
 
 
     def SetUpANestAt(self, Row, Column):
+        # sets up a nest at the specific place, with food(p) with a queen ant and worker ants(p)
         self._Nests.append(Nest(Row, Column, self._StartingFoodInNest))
         self._Ants.append(QueenAnt(Row, Column, Row, Column))
         for Worker in range(2, self._StartingAntsInNest + 1):
             self._Ants.append(WorkerAnt(Row, Column, Row, Column))
 
     def AddFoodToCell(self, Row, Column, Quantity):
+        # adds food to the chosen cell
         self._Grid[self.__GetIndex(Row, Column)].UpdateFoodInCell(Quantity)
 
     def __GetIndex(self, Row, Column):
+        # index of cell from its row and col
+        print(Row,Column, (Row - 1) * self._NumberOfColumns + Column - 1)
         return (Row - 1) * self._NumberOfColumns + Column - 1
-        # e.g. 1,5 = 4 and 2,5 = 9
+        ''' sim1 (5)
+        3 1 = 2*5+0 = 10
+        4 2 = 3*5+1 = 16
+        5 5 = 4*5+4 = 24
+        '''
 
     def __GetIndicesOfNeighbours(self, Row, Column):
         ListOfNeighbours = []
@@ -158,15 +168,19 @@ class Simulation():
             for ColumnDirection in [-1, 0, 1]:
                 NeighbourRow = Row + RowDirection
                 NeighbourColumn = Column + ColumnDirection
+                # checking if neighbour is valid, else -1 = invlaid
                 if (RowDirection != 0 or ColumnDirection != 0) and NeighbourRow >= 1 and NeighbourRow <= self._NumberOfRows and NeighbourColumn >= 1 and NeighbourColumn <= self._NumberOfColumns:
                     ListOfNeighbours.append(self.__GetIndex(NeighbourRow, NeighbourColumn))
                 else:
                     ListOfNeighbours.append(-1)
+        # returns list (len of 9) indecies
         return ListOfNeighbours
 
     def __GetIndexOfNeighbourWithStrongestPheromone(self, Row, Column):
         StrongestPheromone = 0
         IndexOfStrongestPheromone = -1
+        # why would it return -1 !!
+        # gets all neighbours then checks the largest p, returns the neighbours index
         for Index in self.__GetIndicesOfNeighbours(Row, Column):
             if Index != -1 and self.GetStrongestPheromoneInCell(self._Grid[Index]) > StrongestPheromone:
                 IndexOfStrongestPheromone = Index
@@ -174,6 +188,7 @@ class Simulation():
         return IndexOfStrongestPheromone
 
     def GetNestInCell(self, C):
+        # checks if there is a nest in the cell
         for N in self._Nests:
             if N.InSameLocation(C):
                 return N
@@ -181,12 +196,16 @@ class Simulation():
 
     def UpdateAntsPheromoneInCell(self, A):
         for P in self._Pheromones:
+            # if there is a p in the same cell and of the same ant this function is called for
+            # increases the pheramone by the parameter
             if P.InSameLocation(A) and P.GetBelongsTo() == A.GetID():
                 P.UpdateStrength(self._NewPheromoneStrength)
                 return
+        # else creates a new p at the ants cell, belonging to the ant and with the sim parameters
         self._Pheromones.append(Pheromone(A.GetRow(), A.GetColumn(), A.GetID(), self._NewPheromoneStrength, self._PheromoneDecay))
 
     def GetNumberOfAntsInCell(self, C):
+        # checks how many ants in cell
         Count = 0
         for A in self._Ants:
             if A.InSameLocation(C):
@@ -194,6 +213,7 @@ class Simulation():
         return Count
 
     def GetNumberOfPheromonesInCell(self, C):
+        # checks how many p in cell
         Count = 0
         for P in self._Pheromones:
             if P.InSameLocation(C):
@@ -202,6 +222,7 @@ class Simulation():
 
     def GetStrongestPheromoneInCell(self, C):
         Strongest = 0
+        # checks each pheromone in cell, returns the strongest
         for P in self._Pheromones:
             if P.InSameLocation(C):
                 if P.GetStrength() > Strongest:
@@ -249,6 +270,8 @@ class Simulation():
         return Details
 
     def AddFoodToNest(self, Food, Row, Column):
+        # first checks to find the correct nest
+        # then increases the nestfood by food
         for N in self._Nests:
             if N.GetRow() == Row and N.GetColumn() == Column:
                 N.ChangeFood(Food)
@@ -303,6 +326,7 @@ class Simulation():
                 self._Nests, self._Ants, self._Pheromones = N.AdvanceStage(self._Nests, self._Ants, self._Pheromones)
 
 class Entity():
+    # all entities have a cell (row, column) and an ID
     def __init__(self, StartRow, StartColumn):
         self._Row = StartRow
         self._Column = StartColumn
@@ -327,6 +351,7 @@ class Entity():
         return ""
 
 class Cell(Entity):
+    # cells have the attribute of food, everything else is other objects
     def __init__(self, StartRow, StartColumn):
         super().__init__(StartRow, StartColumn)
         self._AmountOfFood = 0
@@ -343,8 +368,10 @@ class Cell(Entity):
 
 class Ant(Entity):
     _NextAntID = 1
+    # each ant will have a unique consequtive ID
 
     def __init__(self, StartRow, StartColumn, NestInRow, NestInColumn):
+        # in addition to entity inheritance, ants have their nest, stages alive, food capacity and type
         super().__init__(StartRow, StartColumn)
         self._NestRow = NestInRow
         self._NestColumn = NestInColumn
@@ -371,14 +398,16 @@ class Ant(Entity):
         self._AmountOfFoodCarried += Change
 
     def _ChangeCell(self, NewCellIndicator, RowToChange, ColumnToChange):
-        if NewCellIndicator > 5:
+        if NewCellIndicator > 5: # [6,7,8]
             RowToChange += 1
-        elif NewCellIndicator < 3:
+        elif NewCellIndicator < 3: # [0,1,2]
             RowToChange -= 1
         if NewCellIndicator in [0, 3, 6]:
             ColumnToChange -= 1
         elif NewCellIndicator in [2, 5, 8]:
             ColumnToChange += 1
+        # [0,1,2,3,4,5,6,7,8] all neighbours
+        # finds and returns the direcition
         return RowToChange, ColumnToChange
 
     def _ChooseRandomNeighbour(self, ListOfNeighbours):
@@ -387,6 +416,7 @@ class Ant(Entity):
             RNo = random.randint(0, len(ListOfNeighbours) - 1)
             if ListOfNeighbours[RNo] != -1:
                 Chosen = True
+        # returms random neighbour as long a it exists (is not -1)
         return RNo
 
     def ChooseCellToMoveTo(self, ListOfNeighbours, IndexOfNeighbourWithStrongestPheromone):
@@ -404,7 +434,10 @@ class Ant(Entity):
     def GetTypeOfAnt(self):
         return self._TypeOfAnt
 
+# question about the queen doing something !!
 class QueenAnt(Ant):
+    # queen ant will inherit all the ant attributes and methods
+    # queens will not move
     def __init__(self, StartRow, StartColumn, NestInRow, NestInColumn): # /:(
         super().__init__(StartRow, StartColumn, NestInRow, NestInColumn)
         self._TypeOfAnt = "queen"
@@ -419,6 +452,8 @@ class WorkerAnt(Ant):
         return f"{super().GetDetails()}, carrying {self._AmountOfFoodCarried} food, home nest is at {self._NestRow} {self._NestColumn}"
 
     def ChooseCellToMoveTo(self, ListOfNeighbours, IndexOfNeighbourWithStrongestPheromone):
+        # happends to each worker ant when a stage progresses
+        # is they have no food they go
         if self._AmountOfFoodCarried > 0:
             if self._Row > self._NestRow:
                 self._Row -= 1
@@ -429,9 +464,11 @@ class WorkerAnt(Ant):
             elif self._Column < self._NestColumn:
                 self._Column += 1
         elif IndexOfNeighbourWithStrongestPheromone == -1:
+            # if they have food they return to the nest by following p
             IndexToUse = self._ChooseRandomNeighbour(ListOfNeighbours)
             self._Row, self._Column = self._ChangeCell(IndexToUse, self._Row, self._Column)
         else:
+            # or they
             IndexToUse = ListOfNeighbours.index(IndexOfNeighbourWithStrongestPheromone)
             self._Row, self._Column = self._ChangeCell(IndexToUse, self._Row, self._Column)
 
@@ -446,6 +483,7 @@ class Nest(Entity):
         Nest._NextNestID += 1
 
     def ChangeFood(self, Change):
+        # the food can never be negative
         self._FoodLevel += Change
         if self._FoodLevel < 0:
             self._FoodLevel = 0
@@ -455,7 +493,9 @@ class Nest(Entity):
 
     def AdvanceStage(self, Nests, Ants, Pheromones):
         if Ants is None:
+            # if ants have all died the sim is over
             return
+
         AntsToCull = 0
         Count = 0
         for A in Ants:
@@ -516,9 +556,9 @@ if __name__ == "__main__":
 
 '''
 CLASS DIAGRAMS:
-+ public
++ public (most methods)
 # protected (these are protected _)
-- private
+- private (cannot access even if inherited __)
 inheritance (arrow point to parent)
 
 Entity (_Row,_Column,_ID)
