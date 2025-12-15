@@ -6,12 +6,20 @@
 
 # paper one sections c and d
 
+# added stuff
+# - added while loop for error handling simulation number input
+# - added oob error handling for getting cell references
+
+
+
 import random
 
 def Main():
     SimulationParameters = []
     validSim = False #
-    while not validSim: #
+    # added while loop for error handling simulation number input
+    # also there is no information on what the simulation options are
+    while SimulationParameters == []: #
         SimNo = input("Enter simulation number: ")
         '''
         parameters = [StartingNumberOfNests, NumberOfRows, NumberOfColumns,
@@ -20,16 +28,12 @@ def Main():
         '''
         if SimNo == "1":
             SimulationParameters = [1, 5, 5, 500, 3, 5, 1000, 50]
-            validSim = True #
         elif SimNo == "2":
             SimulationParameters = [1, 5, 5, 500, 3, 5, 1000, 100]
-            validSim = True #
         elif SimNo == "3":
             SimulationParameters = [1, 10, 10, 500, 3, 9, 1000, 25]
-            validSim = True #
         elif SimNo == "4":
             SimulationParameters = [2, 10, 10, 500, 3, 6, 1000, 25]
-            validSim = True #
     ThisSimulation = Simulation(SimulationParameters)
 
     Choice = ""
@@ -44,6 +48,8 @@ def Main():
         5. advance x stage
         9. quit
         '''
+        maxRow = ThisSimulation.get_NumberOfRows()
+        maxCol = ThisSimulation.get_NumberOfColumns() 
         Choice = GetChoice()
         if Choice == "1":
             print(ThisSimulation.GetDetails())
@@ -52,13 +58,13 @@ def Main():
             StartColumn = 0
             EndRow = 0
             EndColumn = 0
-            StartRow, StartColumn = GetCellReference()
-            EndRow, EndColumn = GetCellReference()
+            StartRow, StartColumn = GetCellReference(maxRow,maxCol) # changed
+            EndRow, EndColumn = GetCellReference(maxRow,maxCol) # changed
             print(ThisSimulation.GetAreaDetails(StartRow, StartColumn, EndRow, EndColumn))
         elif Choice == "3":
             Row = 0
             Column = 0
-            Row, Column = GetCellReference()
+            Row, Column = GetCellReference(maxRow,maxCol) # changed
             print(ThisSimulation.GetCellDetails(Row, Column))
         elif Choice == "4":
             ThisSimulation.AdvanceStage(1)
@@ -84,10 +90,18 @@ def GetChoice():
     Choice = input()
     return Choice
 
-def GetCellReference():
+# changed alot
+def GetCellReference(maxRow, maxCol):
     print()
-    Row = int(input("Enter row number: "))
-    Column = int(input("Enter column number: "))
+    # added extreme handling
+    Row, Column = -1, -1
+    while Row < 0 or Row > maxRow or Column < 0 or Column > maxCol:# 
+        try:
+            Row = int(input("Enter row number: "))
+            Column = int(input("Enter column number: "))
+        except:
+            pass
+    # added try except
     print()
     return Row, Column
 
@@ -145,6 +159,11 @@ class Simulation():
             self.AddFoodToCell(Row, Column,500)
             # 500 food is hard coded
 
+    # added getters
+    def get_NumberOfRows(self):
+        return self._NumberOfRows
+    def get_NumberOfColumns(self):
+        return self._NumberOfColumns
 
     def SetUpANestAt(self, Row, Column):
         # sets up a nest at the specific place, with food(p) with a queen ant and worker ants(p)
