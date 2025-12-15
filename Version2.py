@@ -128,6 +128,7 @@ class Simulation():
                 NeighbourRow = Row + RowDirection
                 NeighbourColumn = Column + ColumnDirection
                 if (RowDirection != 0 or ColumnDirection != 0) and NeighbourRow >= 1 and NeighbourRow <= self._NumberOfRows and NeighbourColumn >= 1 and NeighbourColumn <= self._NumberOfColumns:
+                    # so does not check its self as a neighbour
                     ListOfNeighbours.append(self.__GetIndex(NeighbourRow, NeighbourColumn))
                 else:
                     ListOfNeighbours.append(-1)

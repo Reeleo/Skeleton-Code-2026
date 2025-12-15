@@ -5,7 +5,6 @@
 #Version 2
 
 # paper one sections c and d
-# 
 
 import random
 
@@ -555,8 +554,7 @@ class Nest(Entity):
                 # random ant is killed (this can be any ants stoed in sim._ants, including the queen) !!
                 RPos = random.randint(0, len(Ants) - 1)
                 while not(Ants[RPos].GetNestRow() == self._Row and Ants[RPos].GetNestColumn() == self._Column):
-                    # kills ants not in the nest??
-                    # # # # 
+                    # kills ants in the nest (if not ants in nest then the else statement happens)
                     RPos = random.randint(0, len(Ants) - 1)
                 if Ants[RPos].GetTypeOfAnt() == "queen":
                     self._NumberOfQueens -= 1
