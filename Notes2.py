@@ -9,8 +9,15 @@
 # added stuff
 # - added while loop for error handling simulation number input
 # - added oob error handling for getting cell references
+# - user can now input their own sim parameters 
 
+# also when all food runs out then what
+# simulation doesnt end if all ants are dead / nest is not removed (or maybe game ends when queen dies or no food??) - add a game end
+# add option for creating a new nest??
+# error of increasing pheromones if empty ?? (from wiki)
 
+# fighter ant?? (from wiki)
+# file handling? for adding new sim templates
 
 import random
 
@@ -20,7 +27,7 @@ def Main():
     # added while loop for error handling simulation number input
     # also there is no information on what the simulation options are
     while SimulationParameters == []: #
-        SimNo = input("Enter simulation number: ")
+        SimNo = input("Enter simulation number or press 5 to make your own: ") # changed to add 5
         '''
         parameters = [StartingNumberOfNests, NumberOfRows, NumberOfColumns,
                         StartingFoodInNest, StartingNumberOfFoodCells, StartingAntsInNest,
@@ -28,12 +35,78 @@ def Main():
         '''
         if SimNo == "1":
             SimulationParameters = [1, 5, 5, 500, 3, 5, 1000, 50]
+            # 5x5 grid with 1 nest (with 500 starting food)
+            # 3 food cells 
+            # 5 ants (including queen)
+            # pheromone strength is 1000 with decay of 50 per stage
         elif SimNo == "2":
             SimulationParameters = [1, 5, 5, 500, 3, 5, 1000, 100]
+            # 5x5 grid with 1 nest (with 500 starting food)
+            # 3 food cells 
+            # 5 ants (including queen)
+            # pheromone strength is 1000 with decay of 100 per stage
         elif SimNo == "3":
             SimulationParameters = [1, 10, 10, 500, 3, 9, 1000, 25]
+            # 10x10 grid with 1 nest (with 500 starting food)
+            # 3 food cells 
+            # 9 ants (including queen)
+            # pheromone strength is 1000 with decay of 15 per stage
         elif SimNo == "4":
             SimulationParameters = [2, 10, 10, 500, 3, 6, 1000, 25]
+            # 10x10 grid with 2 nests (with 500 starting food)
+            # 3 food cells 
+            # 6 ants (including queen)
+            # pheromone strength is 1000 with decay of 25 per stage
+        elif SimNo == "5": # changed
+                nests = 0
+                numOfRows = 0
+                numOfCols = 0
+                startingFood = -1
+                foodCells = -1
+                startingAnts = 0
+                pStrenght = 0
+                pDecay = 0
+                while numOfRows < 1:
+                    try:
+                        numOfRows = int(input("Enter number of rows: "))
+                    except:
+                        pass
+                while numOfCols < 1:
+                    try:
+                        numOfCols = int(input("Enter number of columns: "))
+                    except:
+                        pass
+                while nests < 1 or nests > numOfRows*numOfCols:
+                    try:
+                        nests = int(input("Enter number of nests: "))
+                    except:
+                        pass
+                while startingFood < 0:
+                    try:
+                        startingFood = int(input("Enter starting food amount: "))
+                    except:
+                        pass
+                while foodCells < 0:
+                    try:
+                        foodCells = int(input("Enter number of food cells: "))
+                    except:
+                        pass
+                while startingAnts < 1:
+                    try:
+                        startingAnts = int(input("Enter number of starting ants: "))
+                    except:
+                        pass
+                while pStrenght < 1:
+                    try:
+                        pStrenght = int(input("Enter new pheromone strength: "))
+                    except:
+                        pass
+                while pDecay < 1:
+                    try:
+                        pDecay = int(input("Enter pheromone decay: "))
+                    except:
+                        pass
+                SimulationParameters = [nests, numOfRows, numOfRows, startingFood, foodCells, startingAnts, pStrenght, pDecay]
     ThisSimulation = Simulation(SimulationParameters)
 
     Choice = ""
@@ -217,7 +290,7 @@ class Simulation():
                 return N
         return None
 
-    def UpdateAntsPheromoneInCell(self, A):
+    def UpdateAntsPheromoneInCell(self, A): # maybe an error here 
         for P in self._Pheromones:
             # if there is a p in the same cell and of the same ant this function is called for
             # increases the pheramone by the parameter
